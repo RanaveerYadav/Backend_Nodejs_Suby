@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
+const net = require("net");
 
 const vendorRoutes = require("./routes/vendorRoutes");
 const firmRoutes = require("./routes/firmRoutes");
@@ -38,6 +39,58 @@ app.use("/product", productRoutes);
 app.use("/customer", customerRoutes);
 app.use("/public", publicRoutes);
 app.use("/orders", orderRoutes);
+
+// ==========================================
+// SMTP CONNECTIVITY TEST
+// ==========================================
+
+app.get("/debug-smtp", (req, res) => {
+  const socket = new net.Socket();
+
+  socket.setTimeout(10000);
+
+  socket.on("connect", () => {
+    socket.destroy();
+
+    console.log("SMTP TCP CONNECTED: smtp.gmail.com:587");
+
+    res.json({
+      status: "TCP CONNECTED",
+      host: "smtp.gmail.com",
+      port: 587
+    });
+  });
+
+  socket.on("timeout", () => {
+    socket.destroy();
+
+    console.error("SMTP TCP TIMEOUT: smtp.gmail.com:587");
+
+    res.status(504).json({
+      status: "TCP TIMEOUT",
+      host: "smtp.gmail.com",
+      port: 587
+    });
+  });
+
+  socket.on("error", (err) => {
+    socket.destroy();
+
+    console.error("SMTP TCP ERROR:", err.message);
+
+    res.status(500).json({
+      status: "TCP ERROR",
+      error: err.message,
+      code: err.code || null
+    });
+  });
+
+  socket.connect(587, "smtp.gmail.com");
+});
+
+// ==========================================
+// ROOT
+// ==========================================
 
 app.get("/", (req, res) => {
   res.json({

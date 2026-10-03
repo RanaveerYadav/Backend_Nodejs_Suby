@@ -52,24 +52,24 @@ app.get("/debug-smtp", (req, res) => {
   socket.on("connect", () => {
     socket.destroy();
 
-    console.log("SMTP TCP CONNECTED: smtp.gmail.com:587");
+    console.log("SMTP TCP CONNECTED: smtp.gmail.com:465");
 
     res.json({
       status: "TCP CONNECTED",
       host: "smtp.gmail.com",
-      port: 587
+      port: 465
     });
   });
 
   socket.on("timeout", () => {
     socket.destroy();
 
-    console.error("SMTP TCP TIMEOUT: smtp.gmail.com:587");
+    console.error("SMTP TCP TIMEOUT: smtp.gmail.com:465");
 
     res.status(504).json({
       status: "TCP TIMEOUT",
       host: "smtp.gmail.com",
-      port: 587
+      port: 465
     });
   });
 
@@ -84,8 +84,7 @@ app.get("/debug-smtp", (req, res) => {
       code: err.code || null
     });
   });
-
-  socket.connect(587, "smtp.gmail.com");
+socket.connect(465, "smtp.gmail.com");
 });
 
 // ==========================================
